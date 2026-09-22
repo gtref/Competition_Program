@@ -1,3 +1,6 @@
+#ifndef VEX_H
+#define VEX_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -19,3 +22,5 @@
 #define repeat(iterations)                                                     \
   for (int iterator = 0; iterator < iterations; iterator++)
 // END V5 MACROS
+
+#endif

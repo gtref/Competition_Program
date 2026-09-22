@@ -1,3 +1,6 @@
+#ifndef ROBOT_CONFOG_H
+#define ROBOT_CONFOG_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -253,3 +256,4 @@ void onevent_Controller1_ButtonR2_released(void);
 // bool turnToHeading(directionType dir, double heading, rotationUnits units, bool waitForCompletion = true);
 // bool turnToHeading(double heading, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
 // bool turnToHeading(directionType dir, double heading, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
+#endif

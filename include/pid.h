@@ -1,3 +1,6 @@
+#ifndef PID_H
+#define PID_H
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -50,3 +53,5 @@ class PID {
         void set_kD(double new_kD);
         ~PID();
 };
+
+#endif
