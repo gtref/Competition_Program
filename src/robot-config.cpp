@@ -264,7 +264,7 @@ void vexcodeInit(void) {
 
     // Wait for the GPS calibration process to finish
     while (GPS8.isCalibrating()) {
-        task::sleep(50);
+        vex::wait(50, vex::msec);
     }
     GPS8.setLocation(1200, 0, mm, 270, degrees);
 
