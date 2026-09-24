@@ -249,11 +249,4 @@ void onevent_Controller1_ButtonR1_released(void);
 void onevent_Controller1_ButtonR2_pressed(void);
 void onevent_Controller1_ButtonR2_released(void);
 
-// bool spinToPosition(double rotation, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
-// bool spinToPosition(double rotation, rotationUnits units, bool waitForCompletion = true);
-
-// bool turnToHeading(double heading, rotationUnits units, bool waitForCompletion = true);
-// bool turnToHeading(directionType dir, double heading, rotationUnits units, bool waitForCompletion = true);
-// bool turnToHeading(double heading, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
-// bool turnToHeading(directionType dir, double heading, rotationUnits units, double velocity, velocityUnits units_v, bool waitForCompletion = true);
 #endif
