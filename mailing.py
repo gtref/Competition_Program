@@ -26,41 +26,66 @@ def find_repo_root():
         sys.exit(1)
 
 def parse_maintainers(maintainers_path):
-    """Parse MAINTAINERS.md file into structured sections."""
+    """Parse MAINTAINERS.md into structured sections."""
     sections = []
     current = {"name": None, "emails": [], "lists": [], "files": []}
+
     with open(maintainers_path, encoding="utf-8") as f:
         for line in f:
             line = line.strip()
-            if not line or line.startswith("#"):
+            if not line:
                 continue
-            if re.match(r"^[A-Z0-9 _-]+$", line):
-                if current["name"]:
+
+            # SECTION HEADER: "# Something"
+            if line.startswith("#"):
+                name = line.lstrip("#").strip()
+
+                # Save previous section if it had content
+                if current["name"] or current["emails"] or current["lists"] or current["files"]:
                     sections.append(current)
-                current = {"name": line.strip(), "emails": [], "lists": [], "files": []}
-            elif line.startswith("M:"):
+
+                current = {"name": name, "emails": [], "lists": [], "files": []}
+                continue
+
+            # M:, L:, F: lines
+            if line.startswith("M:"):
                 current["emails"].append(line[2:].strip())
             elif line.startswith("L:"):
                 current["lists"].append(line[2:].strip())
             elif line.startswith("F:"):
                 current["files"].append(line[2:].strip())
+
+    # Append last section
+    if current["name"] or current["emails"] or current["lists"] or current["files"]:
         sections.append(current)
+
     return sections
 
 def match_maintainers(changed_files, sections):
     """Find maintainers whose file patterns match changed files."""
     matched = set()
+
     for section in sections:
         for pattern in section["files"]:
+            is_dir = pattern.endswith("/")
+
             for f in changed_files:
-                if fnmatch.fnmatch(f, pattern) or f.startswith(pattern.rstrip("/")):
-                    matched.update(section["emails"])
-                    matched.update(section["lists"])
+                if is_dir:
+                    # directory match
+                    if f.startswith(pattern):
+                        matched.update(section["emails"])
+                        matched.update(section["lists"])
+                else:
+                    # wildcard or exact match
+                    if fnmatch.fnmatch(f, pattern):
+                        matched.update(section["emails"])
+                        matched.update(section["lists"])
+
     return matched
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python who_to_email.py <patchfile>")
+        print("Usage: python mailing.py <patchfile>")
         sys.exit(1)
 
     patch_path = Path(sys.argv[1])
