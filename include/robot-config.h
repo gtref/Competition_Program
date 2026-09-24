@@ -1,7 +1,6 @@
 #ifndef ROBOT_CONFOG_H
 #define ROBOT_CONFOG_H
 
-#include "pid.h"
 #include "vars.hpp"
 
 /*----------------------------------------------------------------------------*/

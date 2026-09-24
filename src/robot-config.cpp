@@ -1,11 +1,3 @@
-#include <stdlib.h>
-#include <stdbool.h>
-#include <math.h>
-#include <string.h>
-
-#include <iostream>
-#include <string>
-
 #include "vex.h"
 #include "robot-config.h"
 
