@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
@@ -290,7 +289,8 @@ void initializeRandomSeed(void) {
 // Helper to make playing sounds from the V5 in VEXcode easier and
 // keeps the code cleaner by making it clear what is happening.
 void playVexcodeSound(const char *soundName) {
-  printf("VEXPlaySound:%s\n", soundName);
+  //printf("VEXPlaySound:%s\n", soundName);
+  std::cout << "VEXPlaySound:%s\n", soundName;
   wait(5, msec);
 }
 
@@ -565,22 +565,22 @@ int usercontrol_buttons(void) {
   Controller1.ButtonRight.released(onevent_Controller1_ButtonRight_released);
 
   Controller1.ButtonX.pressed(onevent_Controller1_ButtonX_pressed);
-  Controller1.ButtonX.released(onevent_Controller1_ButtonX_released);
+  // Controller1.ButtonX.released(onevent_Controller1_ButtonX_released);
   Controller1.ButtonB.pressed(onevent_Controller1_ButtonB_pressed);
-  Controller1.ButtonB.released(onevent_Controller1_ButtonB_released);
+  // Controller1.ButtonB.released(onevent_Controller1_ButtonB_released);
   Controller1.ButtonY.pressed(onevent_Controller1_ButtonY_pressed);
-  Controller1.ButtonY.released(onevent_Controller1_ButtonY_released);
+  // Controller1.ButtonY.released(onevent_Controller1_ButtonY_released);
   Controller1.ButtonA.pressed(onevent_Controller1_ButtonA_pressed);
-  Controller1.ButtonA.released(onevent_Controller1_ButtonA_released);
+  // Controller1.ButtonA.released(onevent_Controller1_ButtonA_released);
 
   Controller1.ButtonL1.pressed(onevent_Controller1_ButtonL1_pressed);
-  Controller1.ButtonL1.released(onevent_Controller1_ButtonL1_released);
+  // Controller1.ButtonL1.released(onevent_Controller1_ButtonL1_released);
   Controller1.ButtonL2.pressed(onevent_Controller1_ButtonL2_pressed);
-  Controller1.ButtonL2.released(onevent_Controller1_ButtonL2_released);
+  // Controller1.ButtonL2.released(onevent_Controller1_ButtonL2_released);
   Controller1.ButtonR1.pressed(onevent_Controller1_ButtonR1_pressed);
-  Controller1.ButtonR1.released(onevent_Controller1_ButtonR1_released);
+  // Controller1.ButtonR1.released(onevent_Controller1_ButtonR1_released);
   Controller1.ButtonR2.pressed(onevent_Controller1_ButtonR2_pressed);
-  Controller1.ButtonR2.released(onevent_Controller1_ButtonR2_released);
+  // Controller1.ButtonR2.released(onevent_Controller1_ButtonR2_released);
 
   while(Competition.isDriverControl() && Competition.isEnabled()) {
 
@@ -644,36 +644,36 @@ void onevent_Controller1_ButtonX_pressed(void) {
   waitUntil(!Controller1.ButtonX.pressing());
 }
 
-void onevent_Controller1_ButtonX_released(void) {
-  // Code to execute when the X button on the controller is released.
-}
+// void onevent_Controller1_ButtonX_released(void) {
+//   // Code to execute when the X button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonB_pressed(void) {
   // Code to execute when the B button on the controller is pressed.
   waitUntil(!Controller1.ButtonB.pressing());
 }
 
-void onevent_Controller1_ButtonB_released(void) {
-  // Code to execute when the B button on the controller is released.
-}
+// void onevent_Controller1_ButtonB_released(void) {
+//   // Code to execute when the B button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonY_pressed(void) {
   // Code to execute when the Y button on the controller is pressed.
   waitUntil(!Controller1.ButtonY.pressing());
 }
 
-void onevent_Controller1_ButtonY_released(void) {
-  // Code to execute when the Y button on the controller is released.
-}
+// void onevent_Controller1_ButtonY_released(void) {
+//   // Code to execute when the Y button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonA_pressed(void) {
   // Code to execute when the A button on the controller is pressed.
   waitUntil(!Controller1.ButtonA.pressing());
 }
 
-void onevent_Controller1_ButtonA_released(void) {
-  // Code to execute when the A button on the controller is released.
-}
+// void onevent_Controller1_ButtonA_released(void) {
+//   // Code to execute when the A button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonL1_pressed(void) {
   // Code to execute when the L1 button on the controller is pressed.
@@ -682,9 +682,9 @@ void onevent_Controller1_ButtonL1_pressed(void) {
   }
 }
 
-void onevent_Controller1_ButtonL1_released(void) {
-  // Code to execute when the L1 button on the controller is released.
-}
+// void onevent_Controller1_ButtonL1_released(void) {
+//   // Code to execute when the L1 button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonL2_pressed(void) {
   // Code to execute when the L2 button on the controller is pressed.
@@ -693,9 +693,9 @@ void onevent_Controller1_ButtonL2_pressed(void) {
   }
 }
 
-void onevent_Controller1_ButtonL2_released(void) {
-  // Code to execute when the L2 button on the controller is released.
-}
+// void onevent_Controller1_ButtonL2_released(void) {
+//   // Code to execute when the L2 button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonR1_pressed(void) {
   // Code to execute when the R1 button on the controller is pressed.
@@ -704,9 +704,9 @@ void onevent_Controller1_ButtonR1_pressed(void) {
   }
 }
 
-void onevent_Controller1_ButtonR1_released(void) {
-  // Code to execute when the R1 button on the controller is released.
-}
+// void onevent_Controller1_ButtonR1_released(void) {
+//   // Code to execute when the R1 button on the controller is released.
+// }
 
 void onevent_Controller1_ButtonR2_pressed(void) {
   // Code to execute when the R2 button on the controller is pressed.
@@ -715,9 +715,9 @@ void onevent_Controller1_ButtonR2_pressed(void) {
   }
 }
 
-void onevent_Controller1_ButtonR2_released(void) {
-  // Code to execute when the R2 button on the controller is released.
-}
+// void onevent_Controller1_ButtonR2_released(void) {
+//   // Code to execute when the R2 button on the controller is released.
+// }
 
 
 int joystick_tracking(void) {
