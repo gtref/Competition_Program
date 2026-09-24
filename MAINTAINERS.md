@@ -4,5 +4,5 @@ F: src/
 F: include/
 
 # General mailing list
-L: General <satiscode@groups.io>
+L: General <satiscode-dev@groups.io>
 F: src/

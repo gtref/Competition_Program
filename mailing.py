@@ -25,6 +25,13 @@ def find_repo_root():
         print("⚠️ Not inside a git repository.")
         sys.exit(1)
 
+def extract_email(field):
+    """Extract only the raw email address."""
+    m = re.search(r"<([^>]+)>", field)
+    if m:
+        return m.group(1).strip()
+    return field.strip()
+
 def parse_maintainers(maintainers_path):
     """Parse MAINTAINERS.md into structured sections."""
     sections = []
@@ -49,9 +56,9 @@ def parse_maintainers(maintainers_path):
 
             # M:, L:, F: lines
             if line.startswith("M:"):
-                current["emails"].append(line[2:].strip())
+                current["emails"].append(extract_email(line[2:].strip()))
             elif line.startswith("L:"):
-                current["lists"].append(line[2:].strip())
+                current["lists"].append(extract_email(line[2:].strip()))
             elif line.startswith("F:"):
                 current["files"].append(line[2:].strip())
 
@@ -63,25 +70,28 @@ def parse_maintainers(maintainers_path):
 
 def match_maintainers(changed_files, sections):
     """Find maintainers whose file patterns match changed files."""
-    matched = set()
+    main = set()
+    cc = set()
 
     for section in sections:
         for pattern in section["files"]:
             is_dir = pattern.endswith("/")
 
             for f in changed_files:
-                if is_dir:
-                    # directory match
-                    if f.startswith(pattern):
-                        matched.update(section["emails"])
-                        matched.update(section["lists"])
-                else:
-                    # wildcard or exact match
-                    if fnmatch.fnmatch(f, pattern):
-                        matched.update(section["emails"])
-                        matched.update(section["lists"])
+                matched = False
 
-    return matched
+                if is_dir:
+                    if f.startswith(pattern):
+                        matched = True
+                else:
+                    if fnmatch.fnmatch(f, pattern):
+                        matched = True
+
+                if matched:
+                    main.update(section["emails"])
+                    cc.update(section["lists"])
+
+    return main, cc
 
 def main():
     if len(sys.argv) != 2:
@@ -98,18 +108,37 @@ def main():
 
     changed_files = extract_changed_files(patch_path)
     sections = parse_maintainers(maintainers_path)
-    maintainers = match_maintainers(changed_files, sections)
+    main_devs, cc_list = match_maintainers(changed_files, sections)
 
     print("📄 Changed files:")
     for f in changed_files:
         print("  -", f)
 
-    if maintainers:
-        print("\n📧 Email your patch to:")
-        for m in sorted(maintainers):
+    print("\n👤 Main developer(s):")
+    if main_devs:
+        for m in sorted(main_devs):
             print("  -", m)
     else:
-        print("\n⚠️ No maintainers found for these files.")
+        print("  - None")
+
+    print("\n📨 CC list:")
+    if cc_list:
+        for c in sorted(cc_list):
+            print("  -", c)
+    else:
+        print("  - None")
+
+    # Build git send-email command
+    cmd = ["git", "send-email", str(patch_path)]
+
+    for m in sorted(main_devs):
+        cmd += ["--to", m]
+
+    for c in sorted(cc_list):
+        cmd += ["--cc", c]
+
+    print("\n💡 Suggested git send-email command:")
+    print(" ".join(cmd))
 
 if __name__ == "__main__":
     main()
