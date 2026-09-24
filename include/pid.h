@@ -1,12 +1,8 @@
 #ifndef PID_H
 #define PID_H
 
-#include <math.h>
-#include <iostream>
-
 class PID {
 private:
-    double setpoint;
     double previous_time;
     double dT;
     double max;

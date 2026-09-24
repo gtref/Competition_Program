@@ -1,21 +1,9 @@
 #include "pid.h"
 
-PID::PID(double maximum, double minimum, double kProportional, double kIntegral, double kDerivative) {
-    previous_time = 0;
-    dT = 0;
-
-    max = maximum;
-    min = minimum;
-
-    kP = kProportional;
-    kI = kIntegral;
-    kD = kDerivative;
-
-    P = 0;
-    I = 0;
-    D = 0;
-
-    previous_error = 0;
+PID::PID(double maximum, double minimum, double kProportional, double kIntegral, double kDerivative)
+    : previous_time(0), dT(0), max(maximum), min(minimum),
+      kP(kProportional), kI(kIntegral), kD(kDerivative),
+      P(0), I(0), D(0), previous_error(0) {
 }
 
 double PID::calculate(double setpoint, double process_variable, double PID_timer) {
@@ -50,7 +38,11 @@ double PID::calculate(double setpoint, double process_variable, double PID_timer
 
         I += (error * dT);
 
-        D = (error - previous_error) / dT;
+        if (dT > 0) {
+            D = (error - previous_error) / dT;
+        } else {
+            D = 0;
+        }
         previous_error = error;
 
         PID_output = (P * kP) + (I * kI) + (D * kD);
