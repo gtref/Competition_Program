@@ -12,11 +12,10 @@ EMAIL_RE = re.compile(r"<([^>]+)>")
 # ------------------------------------------------------------
 
 def run(cmd):
-    """Run a shell command and return output."""
-    return subprocess.check_output(cmd, text=True).strip()
+    """Run a shell command and return output safely."""
+    return subprocess.check_output(cmd, text=True, errors="replace").strip()
 
 def ask(prompt):
-    """Ask user for input."""
     return input(prompt).strip()
 
 def sanitize_filename(name):
@@ -86,7 +85,7 @@ def match_maintainers(changed_files, sections):
 
 def extract_changed_files(patch_path):
     changed = []
-    with open(patch_path, encoding="utf-8") as f:
+    with open(patch_path, encoding="utf-8", errors="replace") as f:
         for line in f:
             if line.startswith("+++ b/"):
                 changed.append(line[6:].strip())
@@ -150,7 +149,7 @@ def main():
     run(["git", "commit", "-s", "-F", str(msg_path)])
 
     # ------------------------------------------------------------
-    # Patch generation with commit-title filename
+    # Patch generation using git format-patch -1
     # ------------------------------------------------------------
     safe_title = sanitize_filename(title)
     patch_name = f"{safe_title}.patch"
@@ -158,9 +157,21 @@ def main():
 
     print(f"\n📦 Generating patch named after commit title: {patch_name}")
 
-    # format-patch normally writes its own filename; we redirect to stdout
-    patch_data = run(["git", "format-patch", "-1", "--stdout"])
-    patch_path.write_text(patch_data, encoding="utf-8")
+    # Generate patch normally
+    run(["git", "format-patch", "-1", "-o", str(repo_root)])
+
+    # Find the generated patch file
+    generated = None
+    for f in repo_root.iterdir():
+        if f.name.startswith("0001-") and f.suffix == ".patch":
+            generated = f
+            break
+
+    if generated is None:
+        sys.exit("❌ Could not find generated patch file.")
+
+    # Rename it
+    generated.rename(patch_path)
 
     print(f"Patch created: {patch_path}")
 
