@@ -56,6 +56,10 @@ int main(void) {
   // Run the pre-autonomous function.
   pre_auton();
 
+  // Start background display and tracking threads
+  thread brain_display_thread = thread(brain_display);
+  thread motor_tracking_thread = thread(motor_tracking);
+
   // Prevent main from exiting with an infinite loop.
   while(true) {
     wait(100, msec);
@@ -75,9 +79,6 @@ int main(void) {
 /*---------------------------------------------------------------------------*/
 
 void pre_auton(void) {
-  thread brain_display_thread = thread(brain_display);;
-  thread motor_tracking_thread = thread(motor_tracking);
-
   LeftFrontDrive.setMaxTorque(100, percent);
   LeftBackDrive.setMaxTorque(100, percent);
   RightFrontDrive.setMaxTorque(100, percent);
@@ -96,24 +97,11 @@ void pre_auton(void) {
   RightBackDrive.setStopping(hold);
   MiddleStrafeDrive.setStopping(hold);
 
-  LeftFrontDrive.spinToPosition(0, degrees, true);
-  LeftBackDrive.spinToPosition(0, degrees, true);
-  RightFrontDrive.spinToPosition(0, degrees, true);
-  RightBackDrive.spinToPosition(0, degrees, true);
-  MiddleStrafeDrive.spinToPosition(0, degrees, true);
-
   LeftFrontDrive.setPosition(0, degrees);
   LeftBackDrive.setPosition(0, degrees);
   RightFrontDrive.setPosition(0, degrees);
   RightBackDrive.setPosition(0, degrees);
   MiddleStrafeDrive.setPosition(0, degrees);
-
-  while(Competition.isEnabled()) {
-    wait(20, msec);
-  }
-
-  brain_display_thread.interrupt();
-  motor_tracking_thread.interrupt();
 }
 
 /*---------------------------------------------------------------------------*/

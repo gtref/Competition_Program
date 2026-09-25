@@ -187,11 +187,11 @@ double MiddleStrafeDrive_PID_values[3];
 
 int32_t value_select = 0;
 
-PID LeftFrontDrive_PID = PID(100.0, -100.0, 0.0, 0.0, 0.0);
-PID LeftBackDrive_PID = PID(100.0, -100.0, 0.0, 0.0, 0.0);
-PID RightFrontDrive_PID = PID(100.0, -100.0, 0.0, 0.0, 0.0);
-PID RightBackDrive_PID = PID(100.0, -100.0, 0.0, 0.0, 0.0);
-PID MiddleStrafeDrive_PID = PID(100.0, -100.0, 0.0, 0.0, 0.0);
+PID LeftFrontDrive_PID = PID(100.0, -100.0, 1.0, 0.0, 0.0);
+PID LeftBackDrive_PID = PID(100.0, -100.0, 1.0, 0.0, 0.0);
+PID RightFrontDrive_PID = PID(100.0, -100.0, 1.0, 0.0, 0.0);
+PID RightBackDrive_PID = PID(100.0, -100.0, 1.0, 0.0, 0.0);
+PID MiddleStrafeDrive_PID = PID(100.0, -100.0, 1.0, 0.0, 0.0);
 
 // VEXcode generated functions
 /*----------------------------------------------------------------------------*/
@@ -486,9 +486,24 @@ int usercontrol_joysticks(void) {
 
     LeftFrontDrive_percent_input = axis3_percent_input + axis1_percent_input;
     LeftBackDrive_percent_input = axis3_percent_input + axis1_percent_input;
-    RightFrontDrive_percent_input = axis3_percent_input + axis1_percent_input;
-    RightBackDrive_percent_input = axis3_percent_input + axis1_percent_input;
+    RightFrontDrive_percent_input = axis3_percent_input - axis1_percent_input;
+    RightBackDrive_percent_input = axis3_percent_input - axis1_percent_input;
     MiddleStrafeDrive_percent_input = axis4_percent_input;
+
+    // Normalize turning and forward throttle if combined input exceeds +/- 100% to preserve steering ratio
+    double max_drive = fabs(LeftFrontDrive_percent_input);
+    if (fabs(RightFrontDrive_percent_input) > max_drive) {
+      max_drive = fabs(RightFrontDrive_percent_input);
+    }
+    if (max_drive > 100.0) {
+      LeftFrontDrive_percent_input = (LeftFrontDrive_percent_input / max_drive) * 100.0;
+      LeftBackDrive_percent_input = (LeftBackDrive_percent_input / max_drive) * 100.0;
+      RightFrontDrive_percent_input = (RightFrontDrive_percent_input / max_drive) * 100.0;
+      RightBackDrive_percent_input = (RightBackDrive_percent_input / max_drive) * 100.0;
+    }
+
+    if (MiddleStrafeDrive_percent_input > 100.0) MiddleStrafeDrive_percent_input = 100.0;
+    if (MiddleStrafeDrive_percent_input < -100.0) MiddleStrafeDrive_percent_input = -100.0;
 
     LeftFrontDrive_rpm_input = LeftFrontDrive_percent_input * drive_cartridge_rpm / 100;
     LeftBackDrive_rpm_input = LeftBackDrive_percent_input * drive_cartridge_rpm / 100;
@@ -497,40 +512,35 @@ int usercontrol_joysticks(void) {
     MiddleStrafeDrive_rpm_input = MiddleStrafeDrive_percent_input * drive_cartridge_rpm / 100;
 
     if(LeftFrontDrive_percent_input != 0) {
-      LeftFrontDrive.setVelocity(LeftFrontDrive_percent, percent);
-      LeftFrontDrive.spin(forward);
+      LeftFrontDrive.spin(forward, LeftFrontDrive_percent, percent);
     }
     else {
       LeftFrontDrive.stop();
     }
 
     if(LeftBackDrive_percent_input != 0) {
-      LeftBackDrive.setVelocity(LeftBackDrive_percent, percent);
-      LeftBackDrive.spin(forward);
+      LeftBackDrive.spin(forward, LeftBackDrive_percent, percent);
     }
     else {
       LeftBackDrive.stop();
     }
 
     if(RightFrontDrive_percent_input != 0) {
-      RightFrontDrive.setVelocity(RightFrontDrive_percent, percent);
-      RightFrontDrive.spin(forward);
+      RightFrontDrive.spin(forward, RightFrontDrive_percent, percent);
     }
     else {
       RightFrontDrive.stop();
     }
 
     if(RightBackDrive_percent_input != 0) {
-      RightBackDrive.setVelocity(RightBackDrive_percent, percent);
-      RightBackDrive.spin(forward);
+      RightBackDrive.spin(forward, RightBackDrive_percent, percent);
     }
     else {
       RightBackDrive.stop();
     }
 
     if(MiddleStrafeDrive_percent_input != 0) {
-      MiddleStrafeDrive.setVelocity(MiddleStrafeDrive_percent, percent);
-      MiddleStrafeDrive.spin(forward);
+      MiddleStrafeDrive.spin(forward, MiddleStrafeDrive_percent, percent);
     }
     else {
       MiddleStrafeDrive.stop();
@@ -757,11 +767,20 @@ int PID_loop(void) {
   timer PID_timer = timer();
 
   while(Competition.isDriverControl() && Competition.isEnabled()) {
-    LeftFrontDrive_percent = LeftFrontDrive_PID.calculate(LeftFrontDrive_percent_input, LeftFrontDrive_percent_output, PID_timer.time(msec));
-    LeftBackDrive_percent = LeftBackDrive_PID.calculate(LeftBackDrive_percent_input, LeftBackDrive_percent_output, PID_timer.time(msec));
-    RightFrontDrive_percent = RightFrontDrive_PID.calculate(RightFrontDrive_percent_input, RightFrontDrive_percent_output, PID_timer.time(msec));
-    RightBackDrive_percent = RightBackDrive_PID.calculate(RightBackDrive_percent_input, RightBackDrive_percent_output, PID_timer.time(msec));
-    MiddleStrafeDrive_percent = MiddleStrafeDrive_PID.calculate(MiddleStrafeDrive_percent_input, MiddleStrafeDrive_percent_output, PID_timer.time(msec));
+    if (PID_enabled) {
+      LeftFrontDrive_percent = LeftFrontDrive_PID.calculate(LeftFrontDrive_percent_input, LeftFrontDrive_percent_output, PID_timer.time(msec));
+      LeftBackDrive_percent = LeftBackDrive_PID.calculate(LeftBackDrive_percent_input, LeftBackDrive_percent_output, PID_timer.time(msec));
+      RightFrontDrive_percent = RightFrontDrive_PID.calculate(RightFrontDrive_percent_input, RightFrontDrive_percent_output, PID_timer.time(msec));
+      RightBackDrive_percent = RightBackDrive_PID.calculate(RightBackDrive_percent_input, RightBackDrive_percent_output, PID_timer.time(msec));
+      MiddleStrafeDrive_percent = MiddleStrafeDrive_PID.calculate(MiddleStrafeDrive_percent_input, MiddleStrafeDrive_percent_output, PID_timer.time(msec));
+    }
+    else {
+      LeftFrontDrive_percent = LeftFrontDrive_percent_input;
+      LeftBackDrive_percent = LeftBackDrive_percent_input;
+      RightFrontDrive_percent = RightFrontDrive_percent_input;
+      RightBackDrive_percent = RightBackDrive_percent_input;
+      MiddleStrafeDrive_percent = MiddleStrafeDrive_percent_input;
+    }
 
     LeftFrontDrive_PID_values[0] = LeftFrontDrive_PID.get_kP();
     LeftFrontDrive_PID_values[1] = LeftFrontDrive_PID.get_kI();
